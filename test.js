@@ -1,19 +1,26 @@
-const fs = require('fs')
-const path = require('path')
+const fs = require('fs');
+const path = require('path');
 
-const postsDirectory = path.join(process.cwd(), 'posts')
+const targetDirectory = path.join(__dirname, 'components');
+const fileNames = fs.readdirSync(targetDirectory);
+console.log('debug ~ file: test.js ~ line 6 ~ fileNames', fileNames);
 
-function getSortedPostsData() {
-  // Get file names under /posts
-  const fileNames = fs.readdirSync(postsDirectory)
-  const allPostsData = fileNames.map(fileName => {
-    // Remove '.md' from file name to get id
-    const id = fileName.replace(/\.md$/, '')
+const rename = (dir) => {
+	const fileNames = fs.readdirSync(dir);
+	fileNames.forEach((fileName) => {
+		if (/\.js$/.test(fileName)) {
+			const newName = fileName.replace(/\.js$/, '.tsx');
+			console.log(
+				'debug ~ file: test.js ~ line 16 ~ fileNames.forEach ~ newName',
+				newName
+			);
+			fs.renameSync(path.join(dir, fileName), path.join(dir, newName));
+		} else {
+			console.log('it is dir', fileName);
+			const childrenDirectory = path.join(dir, fileName);
+			rename(childrenDirectory);
+		}
+	});
+};
 
-    // Read markdown file as string
-    const fullPath = path.join(postsDirectory, fileName)
-    const fileContents = fs.readFileSync(fullPath, 'utf8');
-  })
-}
-
-getSortedPostsData()
+rename(targetDirectory);
